@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CapiVentas - Streaming & Redes Sociales</title>
+    <!-- Font Awesome Icons 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brandRed: '#e50914',
+                        brandDark: '#0f0f12',
+                        brandCard: '#18181c',
+                        brandBorder: '#2a2a30'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0f0f12;
+            color: #ffffff;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(24, 24, 28, 0.95), rgba(15, 15, 18, 0.98));
+            backdrop-filter: blur(12px);
+        }
+
+        .glow-red {
+            box-shadow: 0 0 25px rgba(229, 9, 20, 0.25);
+        }
+
+        .glow-emerald {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-brandDark text-gray-100 flex flex-col min-h-screen antialiased selection:bg-red-600 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 bg-brandDark/90 backdrop-blur-md border-b border-gray-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-tr from-red-600 to-rose-500 rounded-2xl flex items-center justify-center shadow-lg shadow-red-900/40 text-white font-black text-xl tracking-wider">
+                    🍿
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                        CapiVentas <span class="text-xs bg-red-600/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">OFICIAL</span>
+                    </h1>
+                    <p class="text-xs text-gray-400 hidden sm:block">Entrega hoy & garantía 100% en todos tus servicios</p>
+                </div>
+            </div>
+
+            <!-- Header Action Button (Métodos de Pago únicamente) -->
+            <div class="flex items-center gap-2.5">
+                <button onclick="openPaymentModal()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border border-emerald-500/50 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-950/40">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Métodos de Pago</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="relative overflow-hidden bg-gradient-to-b from-red-950/20 via-brandDark to-brandDark py-8 sm:py-12 border-b border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20 mb-4">
+                <i class="fa-solid fa-bolt text-amber-400"></i> 100% Renovables & Cero Cuentas Desechables
+            </span>
+            <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
+                Tu Entretenimiento <span class="bg-gradient-to-r from-red-500 to-amber-500 bg-clip-text text-transparent">Sin Interrupciones</span>
+            </h2>
+            <p class="max-w-2xl mx-auto text-sm sm:text-base text-gray-400 leading-relaxed mb-6">
+                Acceso inmediato a Perfiles Privados, Cuentas Completas, IPTV y Crecimiento Real para Redes Sociales.
+            </p>
+
+            <!-- Search and Filter Row -->
+            <div class="max-w-xl mx-auto relative mb-6">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Buscar servicio (Netflix, Disney, TikTok, Spotify...)" 
+                       class="w-full pl-11 pr-4 py-3 bg-gray-900/90 border border-gray-700/80 rounded-2xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 shadow-inner transition">
+            </div>
+
+            <!-- Categories Filter Pills -->
+            <div class="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar py-2 px-2">
+                <button onclick="setCategory('all', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-red-600 text-white shadow-md shadow-red-900/30 whitespace-nowrap">
+                    🔥 Todos los Servicios
+                </button>
+                <button onclick="setCategory('perfil', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-gray-800/80 text-gray-300 border border-gray-700/50 hover:bg-gray-700 whitespace-nowrap">
+                    👤 Perfiles Privados
+                </button>
+                <button onclick="setCategory('completa', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-gray-800/80 text-gray-300 border border-gray-700/50 hover:bg-gray-700 whitespace-nowrap">
+                    🏠 Cuentas Completas
+                </button>
+                <button onclick="setCategory('iptv', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-gray-800/80 text-gray-300 border border-gray-700/50 hover:bg-gray-700 whitespace-nowrap">
+                    📡 IPTV & Música
+                </button>
+                <button onclick="setCategory('redes', this)" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-gray-800/80 text-gray-300 border border-gray-700/50 hover:bg-gray-700 whitespace-nowrap">
+                    🚀 Redes Sociales
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Catalog Grid Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- Section Header -->
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-800">
+            <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-red-500"></i> Catálogo de Precios Disponibles
+                </h3>
+                <p class="text-xs text-gray-400">Precios garantizados con entrega inmediata</p>
+            </div>
+            <span class="text-xs font-mono bg-gray-800 text-emerald-400 px-3 py-1 rounded-lg border border-gray-700">
+                <span id="productCount">0</span> Productos
+            </span>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Dynamic cards rendered via JavaScript -->
+        </div>
+
+        <!-- Empty Search State -->
+        <div id="emptyState" class="hidden text-center py-16 bg-gray-900/40 rounded-3xl border border-gray-800">
+            <i class="fa-solid fa-ghost text-5xl text-gray-600 mb-4"></i>
+            <h4 class="text-lg font-bold text-gray-300 mb-1">No encontramos servicios que coincidan</h4>
+            <p class="text-xs text-gray-500 mb-4">Intenta buscar otro nombre o limpia los filtros</p>
+            <button onclick="resetFilters()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition">
+                Ver todos los productos
+            </button>
+        </div>
+    </main>
+
+    <!-- BUY MODAL -->
+    <div id="buyModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-brandCard border border-gray-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeBuyModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="mb-4">
+                <span id="modalProductCategory" class="text-[10px] font-extrabold uppercase tracking-widest text-red-500 bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-md">
+                    CATEGORÍA
+                </span>
+                <h3 id="modalProductTitle" class="text-2xl font-black text-white mt-2 mb-1">Nombre Servicio</h3>
+                <p id="modalProductDesc" class="text-xs text-gray-400 leading-relaxed">Descripción detallada del servicio.</p>
+            </div>
+
+            <div class="bg-gray-900/90 border border-gray-800 rounded-2xl p-4 mb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs text-gray-400 font-semibold">Precio unitario:</span>
+                    <span id="modalProductPrice" class="text-lg font-black text-emerald-400 font-mono">$0 MXN</span>
+                </div>
+
+                <!-- Duration / Quantity Selector -->
+                <div class="space-y-2">
+                    <label class="block text-xs text-gray-300 font-bold">Seleccionar Duración / Cantidad:</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="selectDuration(1, this)" class="dur-btn py-2 text-xs font-bold bg-red-600 text-white border border-red-500 rounded-xl transition">
+                            1 Paq / Mes
+                        </button>
+                        <button onclick="selectDuration(2, this)" class="dur-btn py-2 text-xs font-bold bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 rounded-xl transition">
+                            2 Paq / Meses
+                        </button>
+                        <button onclick="selectDuration(3, this)" class="dur-btn py-2 text-xs font-bold bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 rounded-xl transition">
+                            3 Paq / Meses
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-gray-800 flex items-center justify-between">
+                    <span class="text-xs text-gray-300 font-bold">Total a pagar:</span>
+                    <span id="calculatedTotal" class="text-xl font-black text-emerald-400 font-mono">$0 MXN</span>
+                </div>
+            </div>
+
+            <div class="space-y-2.5">
+                <a id="modalWhatsappLink" href="#" target="_blank" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold rounded-2xl text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/50">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Solicitar por WhatsApp Directo
+                </a>
+                <button onclick="closeBuyModal(); openPaymentModal();" class="w-full py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold rounded-2xl text-xs transition border border-gray-700">
+                    Ver Datos Bancarios para Transferencia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT METHODS MODAL -->
+    <div id="paymentModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-brandCard border border-gray-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closePaymentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl font-bold">
+                    <i class="fa-solid fa-building-columns"></i>
+                </div>
+                <h3 class="text-xl font-black text-white">Métodos de Pago Oficiales</h3>
+                <p class="text-xs text-gray-400">Transferencias SPEI, Mercado Pago o Tarjeta</p>
+            </div>
+
+            <!-- Beneficiary Details Card -->
+            <div class="bg-gradient-to-br from-gray-900 to-gray-900/90 border border-gray-700/80 rounded-2xl p-4 space-y-3.5 mb-6 shadow-inner">
+                <!-- Beneficiary -->
+                <div class="flex items-center justify-between pb-2.5 border-b border-gray-800">
+                    <div>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider block">Titular de la Cuenta</span>
+                        <span class="text-sm font-extrabold text-white">Oscar White</span>
+                    </div>
+                    <span class="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold px-2 py-0.5 rounded">
+                        Mercado Pago
+                    </span>
+                </div>
+
+                <!-- SPEI CLABE -->
+                <div>
+                    <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider block mb-1">CLABE Interbancaria (SPEI)</span>
+                    <div class="flex items-center justify-between bg-black/60 p-2.5 rounded-xl border border-gray-800">
+                        <span class="font-mono text-sm font-bold text-emerald-400 tracking-wider">722969011030556220</span>
+                        <button onclick="copyToClipboard('722969011030556220', 'CLABE SPEI')" class="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs font-bold rounded-lg border border-emerald-500/30 transition flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Debit Card Mastercard -->
+                <div>
+                    <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider block mb-1">Número de Tarjeta (Mastercard)</span>
+                    <div class="flex items-center justify-between bg-black/60 p-2.5 rounded-xl border border-gray-800">
+                        <span class="font-mono text-sm font-bold text-amber-400 tracking-wider">5428 7809 7453 0065</span>
+                        <button onclick="copyToClipboard('5428780974530065', 'Número de Tarjeta')" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-xs font-bold rounded-lg border border-amber-500/30 transition flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WhatsApp Instructions -->
+            <p class="text-[11px] text-gray-400 text-center mb-4">
+                💡 Una vez realizado tu depósito o transferencia, envía el comprobante a nuestro WhatsApp para enviarte tus accesos al instante.
+            </p>
+
+            <a href="https://wa.me/523316087041?text=Hola%20Oscar!%20🍿%20Acabo%20de%20realizar%20un%20pago,%20aquí%20adjunto%20mi%20comprobante:" target="_blank" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40">
+                <i class="fa-brands fa-whatsapp text-base"></i> Enviar Comprobante por WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toast" class="fixed top-5 right-5 z-50 bg-emerald-500 text-white px-4 py-3 rounded-2xl shadow-2xl border border-emerald-400/40 flex items-center gap-3 transform translate-y-[-100px] opacity-0 transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <div>
+            <h5 id="toastTitle" class="font-bold text-xs">¡Éxito!</h5>
+            <p id="toastMsg" class="text-[11px] text-emerald-100">Operación completada.</p>
+        </div>
+    </div>
+
+    <!-- Floating WhatsApp CTA -->
+    <a id="floatingWhatsappBtn" href="https://wa.me/523316087041?text=Hola%20CapiVentas!%20🍿%20Quisiera%20información%20sobre%20tus%20servicios" target="_blank" 
+       class="fixed bottom-6 right-6 z-40 bg-emerald-500 hover:bg-emerald-400 text-white p-3.5 rounded-full shadow-2xl shadow-emerald-950/80 flex items-center justify-center hover:scale-110 transition-all duration-300 group border border-emerald-400/30">
+        <i class="fa-brands fa-whatsapp text-3xl"></i>
+        <span class="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 ease-in-out whitespace-nowrap text-xs font-bold pl-0 group-hover:pl-2.5">
+            ¡Escríbenos Directo!
+        </span>
+    </a>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-gray-800/80 bg-brandDark py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-gray-500 space-y-2">
+            <p class="font-semibold text-gray-400">🍿 CapiVentas © 2026 — Servicios de Streaming, IPTV & Redes Sociales</p>
+            <p>Garantía de servicio y atención personalizada vía WhatsApp: <span class="font-mono text-emerald-400 font-bold">+52 1 33 1608 7041</span></p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Catalog definitions organized logically: Perfil and Cuenta Completa grouped together
+        const products = [
+            // NETFLIX (Perfil Privado, Perfil Compartido, Cuenta Completa)
+            {
+                id: 1,
+                name: "Netflix Perfil Privado",
+                category: "perfil",
+                price: 89,
+                unit: "MXN / mes",
+                desc: "Perfil privado 100% renovable con PIN personal. Cero cuentas desechables y máxima estabilidad.",
+                icon: "fa-film",
+                badge: "MÁS VENDIDO",
+                badgeColor: "bg-red-600",
+                img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 2,
+                name: "Netflix Perfil Compartido",
+                category: "perfil",
+                price: 79,
+                unit: "MXN / mes",
+                desc: "Ingresas con código de acceso rápido. Garantía de funcionamiento constante.",
+                icon: "fa-key",
+                badge: "ECONÓMICO",
+                badgeColor: "bg-amber-600",
+                img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 3,
+                name: "Netflix Cuenta Completa",
+                category: "completa",
+                price: 289,
+                unit: "MXN / mes",
+                desc: "Cuenta completa privada para toda la familia. Renovación mensual asegurada.",
+                icon: "fa-tv",
+                badge: "FAMILIAR",
+                badgeColor: "bg-red-700",
+                img: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // DISNEY+ PREMIUM (Perfil, Cuenta Completa)
+            {
+                id: 4,
+                name: "Disney+ Premium Perfil (con ESPN)",
+                category: "perfil",
+                price: 50,
+                unit: "MXN / mes",
+                desc: "Incluye todo el contenido de Disney+, Star+ y deportes en vivo de ESPN en 4K.",
+                icon: "fa-wand-magic-sparkles",
+                badge: "4K + ESPN",
+                badgeColor: "bg-blue-600",
+                img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 5,
+                name: "Disney+ Premium Cuenta Completa",
+                category: "completa",
+                price: 140,
+                unit: "MXN / mes",
+                desc: "Cuenta completa Disney+ Premium con ESPN para ver en múltiples pantallas.",
+                icon: "fa-tv",
+                badge: "COMPLETA",
+                badgeColor: "bg-blue-700",
+                img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b834?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // MAX PLATINO (Perfil, Cuenta Completa)
+            {
+                id: 6,
+                name: "Max Platino Perfil",
+                category: "perfil",
+                price: 45,
+                unit: "MXN / mes",
+                desc: "Series exclusivas de HBO, películas de Warner y Champions League en vivo.",
+                icon: "fa-clapperboard",
+                badge: "PLATINO",
+                badgeColor: "bg-purple-600",
+                img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 7,
+                name: "Max Platino Cuenta Completa",
+                category: "completa",
+                price: 85,
+                unit: "MXN / mes",
+                desc: "Cuenta completa Max Platino para disfrutar de todo el catálogo en alta definición.",
+                icon: "fa-tv",
+                badge: "COMPLETA",
+                badgeColor: "bg-purple-700",
+                img: "https://images.unsplash.com/photo-1518676599625-583f23f66a2a?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // VIX+ (Perfil 1 Mes, Perfil Anual)
+            {
+                id: 8,
+                name: "ViX+ Perfil (1 Mes)",
+                category: "perfil",
+                price: 32,
+                unit: "MXN / mes",
+                desc: "Partidos de liga mexicana, novelas, películas y series en español.",
+                icon: "fa-play",
+                badge: "OFERTA",
+                badgeColor: "bg-amber-600",
+                img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 9,
+                name: "ViX+ Perfil (Plan Anual)",
+                category: "perfil",
+                price: 55,
+                unit: "MXN / año",
+                desc: "Acceso súper económico para todo el año de contenido ViX+.",
+                icon: "fa-calendar-check",
+                badge: "PLAN ANUAL",
+                badgeColor: "bg-amber-700",
+                img: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // CRUNCHYROLL (Perfil, Cuenta Completa)
+            {
+                id: 10,
+                name: "Crunchyroll Perfil",
+                category: "perfil",
+                price: 38,
+                unit: "MXN / mes",
+                desc: "Anime simulcast sin anuncios, manga y estrenos directamente desde Japón.",
+                icon: "fa-dragon",
+                badge: "ANIME MEGA",
+                badgeColor: "bg-orange-600",
+                img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 11,
+                name: "Crunchyroll Cuenta Completa",
+                category: "completa",
+                price: 75,
+                unit: "MXN / mes",
+                desc: "Cuenta Fan / Mega Fan completa para disfrutar todo el catálogo de Anime.",
+                icon: "fa-tv",
+                badge: "COMPLETA",
+                badgeColor: "bg-orange-700",
+                img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // PRIME VIDEO (Perfil, Cuenta Completa)
+            {
+                id: 12,
+                name: "Prime Video Perfil",
+                category: "perfil",
+                price: 40,
+                unit: "MXN / mes",
+                desc: "Series y películas exclusivas de Amazon Prime Video en alta definición.",
+                icon: "fa-box",
+                badge: "POPULAR",
+                badgeColor: "bg-sky-600",
+                img: "https://images.unsplash.com/photo-1586899028174-e7098604235b?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 13,
+                name: "Prime Video Cuenta Completa",
+                category: "completa",
+                price: 70,
+                unit: "MXN / mes",
+                desc: "Cuenta entera para tu hogar u oficina con garantía de servicio.",
+                icon: "fa-tv",
+                badge: "COMPLETA",
+                badgeColor: "bg-sky-700",
+                img: "https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // PARAMOUNT+
+            {
+                id: 14,
+                name: "Paramount+ Perfil",
+                category: "perfil",
+                price: 38,
+                unit: "MXN / mes",
+                desc: "Premier League, contenidos de Nickelodeon, Paramount Pictures y Showtime.",
+                icon: "fa-mountain",
+                badge: "DEPORTES",
+                badgeColor: "bg-blue-800",
+                img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // IPTV & MÚSICA
+            {
+                id: 15,
+                name: "IPTV Servicio 1 Mes",
+                category: "iptv",
+                price: 60,
+                unit: "MXN / mes",
+                desc: "+3000 Canales en vivo, deportes en HD/4K, Magis TV, películas y series de estreno.",
+                icon: "fa-satellite-dish",
+                badge: "EN VIVO",
+                badgeColor: "bg-emerald-600",
+                img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 16,
+                name: "IPTV Servicio 3 Meses",
+                category: "iptv",
+                price: 85,
+                unit: "MXN / 3 meses",
+                desc: "Paquete de 3 meses de TV en vivo y películas con el mejor ahorro.",
+                icon: "fa-bolt",
+                badge: "AHORRO VIP",
+                badgeColor: "bg-emerald-700",
+                img: "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 17,
+                name: "Spotify Premium (1 Mes)",
+                category: "iptv",
+                price: 75,
+                unit: "MXN / mes",
+                desc: "Música sin interrupciones, descargas offline y la máxima calidad de audio.",
+                icon: "fa-music",
+                badge: "MÚSICA",
+                badgeColor: "bg-emerald-500",
+                img: "https://images.unsplash.com/photo-1614680376593-902f749f7edc?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 18,
+                name: "Canva Pro (1 Mes)",
+                category: "iptv",
+                price: 30,
+                unit: "MXN / mes",
+                desc: "Acceso completo a plantillas Pro, quitador de fondos y recursos de diseño ilimitados.",
+                icon: "fa-palette",
+                badge: "DISEÑO",
+                badgeColor: "bg-indigo-600",
+                img: "https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // REDES SOCIALES: TIKTOK VISTAS
+            {
+                id: 19,
+                name: "TikTok - 1,000 Vistas",
+                category: "redes",
+                price: 35,
+                unit: "MXN",
+                desc: "Impresiones y reproducciones rápidas para posicionar tus videos de TikTok.",
+                icon: "fa-brands fa-tiktok",
+                badge: "VISTAS TIKTOK",
+                badgeColor: "bg-pink-600",
+                img: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 20,
+                name: "TikTok - 5,000 Vistas",
+                category: "redes",
+                price: 85,
+                unit: "MXN",
+                desc: "Paquete medio de vistas en TikTok para viralizar tu contenido.",
+                icon: "fa-brands fa-tiktok",
+                badge: "VISTAS TIKTOK",
+                badgeColor: "bg-pink-600",
+                img: "https://images.unsplash.com/photo-1598128558393-70ff21433be0?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 21,
+                name: "TikTok - 10,000 Vistas",
+                category: "redes",
+                price: 150,
+                unit: "MXN",
+                desc: "Aumento masivo de interacciones para escalar en el algoritmo de TikTok.",
+                icon: "fa-brands fa-tiktok",
+                badge: "VIRAL TIKTOK",
+                badgeColor: "bg-pink-700",
+                img: "https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // REDES SOCIALES: TIKTOK SEGUIDORES (CON GARANTÍA)
+            {
+                id: 22,
+                name: "TikTok - 1,000 Seguidores (Con Garantía)",
+                category: "redes",
+                price: 105,
+                unit: "MXN",
+                desc: "Seguidores con garantía total para desbloquear LIVEs y enlaces en bio.",
+                icon: "fa-brands fa-tiktok",
+                badge: "CON GARANTÍA",
+                badgeColor: "bg-emerald-600",
+                img: "https://images.unsplash.com/photo-1611605698335-8b1569810432?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 23,
+                name: "TikTok - 5,000 Seguidores (Con Garantía)",
+                category: "redes",
+                price: 360,
+                unit: "MXN",
+                desc: "Crecimiento rápido asegurado para tu cuenta personal o de negocio en TikTok.",
+                icon: "fa-brands fa-tiktok",
+                badge: "CON GARANTÍA",
+                badgeColor: "bg-emerald-600",
+                img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 24,
+                name: "TikTok - 10,000 Seguidores (Con Garantía)",
+                category: "redes",
+                price: 690,
+                unit: "MXN",
+                desc: "Impulso masivo con garantía para potenciar tu perfil al máximo.",
+                icon: "fa-brands fa-tiktok",
+                badge: "GARANTÍA VIP",
+                badgeColor: "bg-emerald-700",
+                img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // REDES SOCIALES: FACEBOOK SEGUIDORES
+            {
+                id: 25,
+                name: "Facebook - 1,000 Seguidores",
+                category: "redes",
+                price: 60,
+                unit: "MXN",
+                desc: "Aumenta la credibilidad de tu perfil o página de Facebook.",
+                icon: "fa-brands fa-facebook",
+                badge: "FACEBOOK",
+                badgeColor: "bg-blue-600",
+                img: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 26,
+                name: "Facebook - 5,000 Seguidores",
+                category: "redes",
+                price: 140,
+                unit: "MXN",
+                desc: "Ideal para monetizar o fortalecer tu comunidad en Facebook.",
+                icon: "fa-brands fa-facebook",
+                badge: "FACEBOOK",
+                badgeColor: "bg-blue-600",
+                img: "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 27,
+                name: "Facebook - 10,000 Seguidores",
+                category: "redes",
+                price: 250,
+                unit: "MXN",
+                desc: "Paquete pro para impulsar marcas y creadores de contenido.",
+                icon: "fa-brands fa-facebook",
+                badge: "PRO FACEBOOK",
+                badgeColor: "bg-blue-700",
+                img: "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=600&auto=format&fit=crop"
+            },
+
+            // REDES SOCIALES: INSTAGRAM SEGUIDORES
+            {
+                id: 28,
+                name: "Instagram - 1,000 Seguidores",
+                category: "redes",
+                price: 70,
+                unit: "MXN",
+                desc: "Potencia el perfil de tu marca personal o negocio en Instagram.",
+                icon: "fa-brands fa-instagram",
+                badge: "INSTAGRAM",
+                badgeColor: "bg-purple-600",
+                img: "https://images.unsplash.com/photo-1611262588024-d12430b98920?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 29,
+                name: "Instagram - 5,000 Seguidores",
+                category: "redes",
+                price: 150,
+                unit: "MXN",
+                desc: "Consolida tu imagen en Instagram con seguidores reales y rápidos.",
+                icon: "fa-brands fa-instagram",
+                badge: "INSTAGRAM",
+                badgeColor: "bg-purple-600",
+                img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop"
+            },
+            {
+                id: 30,
+                name: "Instagram - 10,000 Seguidores",
+                category: "redes",
+                price: 240,
+                unit: "MXN",
+                desc: "Aumento masivo para destacar en la plataforma de Instagram.",
+                icon: "fa-brands fa-instagram",
+                badge: "TOP INSTAGRAM",
+                badgeColor: "bg-purple-700",
+                img: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600&auto=format&fit=crop"
+            }
+        ];
+
+        let sellerPhone = "523316087041";
+        let activeCategory = "all";
+        let currentSelectedProduct = null;
+        let selectedDurationMonths = 1;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            updateFloatingWhatsapp();
+        });
+
+        function updateFloatingWhatsapp() {
+            const floatBtn = document.getElementById('floatingWhatsappBtn');
+            if (floatBtn) {
+                const text = "Hola CapiVentas! 🍿 Quisiera solicitar información sobre sus servicios de streaming y redes sociales.";
+                floatBtn.href = `https://wa.me/${sellerPhone}?text=${encodeURIComponent(text)}`;
+            }
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const productCountEl = document.getElementById('productCount');
+            const searchInput = document.getElementById('searchInput');
+            
+            const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const filtered = products.filter(p => {
+                const matchesCat = (activeCategory === 'all') || (p.category === activeCategory);
+                const matchesSearch = p.name.toLowerCase().includes(searchVal) || p.desc.toLowerCase().includes(searchVal);
+                return matchesCat && matchesSearch;
+            });
+
+            if (productCountEl) {
+                productCountEl.innerText = filtered.length;
+            }
+
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                if (emptyState) emptyState.classList.remove('hidden');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            if (emptyState) emptyState.classList.add('hidden');
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "card glass-card rounded-2xl p-4 flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300 shadow-lg hover:shadow-red-900/20 group relative border border-gray-800";
+
+                // Formatting icon class safely for FontAwesome 6
+                let iconClass = p.icon || 'fa-solid fa-star';
+                if (!iconClass.includes('fa-')) {
+                    iconClass = 'fa-solid ' + iconClass;
+                } else if (!iconClass.includes('fa-solid') && !iconClass.includes('fa-brands') && !iconClass.includes('fa-regular')) {
+                    iconClass = 'fa-solid ' + iconClass;
+                }
+
+                card.innerHTML = `
+                    <div>
+                        <!-- Image Banner with Badge -->
+                        <div class="relative mb-3.5 overflow-hidden rounded-xl h-36 bg-gray-900 border border-gray-800/80 group-hover:border-gray-700 transition">
+                            <img src="${p.img || 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=500&auto=format&fit=crop'}" 
+                                 alt="${p.name}" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=500&auto=format&fit=crop';">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                            
+                            <!-- Status Badge -->
+                            <span class="${p.badgeColor || 'bg-red-600'} absolute top-2.5 right-2.5 text-white text-[10px] font-black px-2.5 py-1 rounded-md shadow-md uppercase tracking-wider backdrop-blur-sm max-w-[70%] truncate">
+                                ${p.badge || 'Disponible'}
+                            </span>
+                            <span class="absolute bottom-2 left-2.5 text-[10px] uppercase font-bold text-gray-300 bg-black/70 px-2 py-0.5 rounded backdrop-blur-sm border border-white/10 tracking-wider">${p.category}</span>
+                        </div>
+
+                        <!-- Title and Icon -->
+                        <h3 class="font-bold text-base text-white group-hover:text-red-400 transition-colors leading-snug mb-2 flex items-center gap-2">
+                            <i class="${iconClass} text-red-500 text-sm shrink-0"></i>
+                            <span>${p.name}</span>
+                        </h3>
+                        <p class="text-xs text-gray-400 leading-relaxed mb-4 line-clamp-2">${p.desc}</p>
+                    </div>
+
+                    <!-- Footer Action Controls -->
+                    <div class="pt-3 border-t border-gray-800/80">
+                        <div class="flex items-baseline justify-between mb-3">
+                            <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">PRECIO:</span>
+                            <span class="text-lg font-black text-emerald-400 font-mono">$${p.price} <span class="text-xs font-normal text-gray-400">${p.unit}</span></span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="openBuyModal(${p.id})" class="w-full py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold rounded-xl text-xs transition border border-gray-700/80 flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-circle-info text-amber-400"></i> Detalles
+                            </button>
+                            <a href="${getDirectWhatsappUrl(p)}" target="_blank" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950/50">
+                                <i class="fa-brands fa-whatsapp text-sm"></i> Comprar
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function getDirectWhatsappUrl(product, months = 1) {
+            const totalPrice = product.price * months;
+            const isRedes = product.category === 'redes';
+            const detailStr = isRedes ? `📦 *Paquete:* ${months} x ${product.name}` : `⏱️ *Duración:* ${months} período(s)`;
+            
+            const text = `Hola CapiVentas! 🍿 Quiero pedir el siguiente servicio:\n\n📌 *Servicio:* ${product.name}\n${detailStr}\n💰 *Total:* $${totalPrice} MXN\n\n¿Me proporcionas los datos para depositar/transferir?`;
+            return `https://wa.me/${sellerPhone}?text=${encodeURIComponent(text)}`;
+        }
+
+        function setCategory(cat, btnElem) {
+            activeCategory = cat;
+            const buttons = document.querySelectorAll('.cat-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-red-600', 'text-white', 'shadow-md', 'shadow-red-900/30');
+                btn.classList.add('bg-gray-800/80', 'text-gray-300', 'border', 'border-gray-700/50');
+            });
+
+            if (btnElem) {
+                btnElem.classList.remove('bg-gray-800/80', 'text-gray-300', 'border', 'border-gray-700/50');
+                btnElem.classList.add('bg-red-600', 'text-white', 'shadow-md', 'shadow-red-900/30');
+            }
+
+            renderProducts();
+        }
+
+        function filterProducts() {
+            renderProducts();
+        }
+
+        function resetFilters() {
+            const searchInp = document.getElementById('searchInput');
+            if (searchInp) searchInp.value = '';
+            activeCategory = 'all';
+            const buttons = document.querySelectorAll('.cat-btn');
+            buttons.forEach((btn, idx) => {
+                if (idx === 0) {
+                    btn.classList.add('bg-red-600', 'text-white');
+                } else {
+                    btn.classList.remove('bg-red-600', 'text-white');
+                    btn.classList.add('bg-gray-800/80', 'text-gray-300');
+                }
+            });
+            renderProducts();
+        }
+
+        function openBuyModal(productId) {
+            currentSelectedProduct = products.find(p => p.id === productId);
+            if (!currentSelectedProduct) return;
+
+            selectedDurationMonths = 1;
+            
+            document.getElementById('modalProductTitle').innerText = currentSelectedProduct.name;
+            document.getElementById('modalProductPrice').innerText = `$${currentSelectedProduct.price} ${currentSelectedProduct.unit}`;
+            document.getElementById('modalProductDesc').innerText = currentSelectedProduct.desc;
+            document.getElementById('modalProductCategory').innerText = currentSelectedProduct.category.toUpperCase();
+
+            const firstDurBtn = document.querySelector('.dur-btn');
+            selectDuration(1, firstDurBtn);
+
+            const modal = document.getElementById('buyModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function selectDuration(months, btnElem) {
+            selectedDurationMonths = months;
+            const btns = document.querySelectorAll('.dur-btn');
+            btns.forEach(btn => {
+                btn.classList.remove('bg-red-600', 'text-white', 'border-red-500');
+                btn.classList.add('bg-gray-800', 'text-gray-300', 'border-gray-700');
+            });
+
+            if (btnElem) {
+                btnElem.classList.remove('bg-gray-800', 'text-gray-300', 'border-gray-700');
+                btnElem.classList.add('bg-red-600', 'text-white', 'border-red-500');
+            }
+
+            if (currentSelectedProduct) {
+                const total = currentSelectedProduct.price * months;
+                document.getElementById('calculatedTotal').innerText = `$${total} MXN`;
+                document.getElementById('modalWhatsappLink').href = getDirectWhatsappUrl(currentSelectedProduct, months);
+            }
+        }
+
+        function closeBuyModal() {
+            const modal = document.getElementById('buyModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function openPaymentModal() {
+            const modal = document.getElementById('paymentModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closePaymentModal() {
+            const modal = document.getElementById('paymentModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').innerText = title;
+            document.getElementById('toastMsg').innerText = msg;
+
+            toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-100px]', 'opacity-0');
+            }, 3000);
+        }
+
+        function copyToClipboard(text, label) {
+            const input = document.createElement('input');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            showToast('¡Copiado!', `${label} copiado al portapapeles.`);
+        }
+    </script>
+</body>
+</html>
